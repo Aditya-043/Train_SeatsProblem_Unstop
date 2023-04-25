@@ -1,0 +1,59 @@
+# Define the seat layout of the coach
+seats = []
+for i in range(1, 81):
+    if i % 7 == 0 or i % 7 == 4:
+        seats.append('X')
+    else:
+        seats.append('O')
+
+# Define a function to reserve seats
+def reserve_seats(num_seats):
+    # Check if there are enough available seats
+    if seats.count('O') < num_seats:
+        return 'Sorry, there are not enough available seats.'
+
+    # Search for a row with enough consecutive available seats
+    start_seat = None
+    end_seat = None
+    for i in range(len(seats)):
+        if seats[i] == 'O':
+            if start_seat is None:
+                start_seat = i
+            if i - start_seat == num_seats - 1:
+                end_seat = i
+                break
+        else:
+            start_seat = None
+
+    # If a row with enough consecutive available seats is found, reserve those seats
+    if end_seat is not None:
+        for i in range(start_seat, end_seat+1):
+            seats[i] = 'X'
+        return 'Reserved seats: ' + ', '.join(str(i+1) for i in range(start_seat, end_seat+1))
+
+    # If a row with enough consecutive available seats is not found, search for nearby available seats
+    for i in range(len(seats)):
+        if seats[i] == 'O':
+            start_seat = i
+            end_seat = i
+            for j in range(i+1, len(seats)):
+                if seats[j] == 'O':
+                    end_seat = j
+                else:
+                    break
+            num_available_seats = end_seat - start_seat + 1
+            if num_available_seats >= num_seats:
+                for j in range(start_seat, start_seat+num_seats):
+                    seats[j] = 'X'
+                return 'Reserved seats: ' + ', '.join(str(i+1) for i in range(start_seat, start_seat+num_seats))
+
+    # If no suitable seats are found, return a message stating that the coach is full
+    return 'Sorry, the coach is full.'
+
+# Example usage
+num_seats = int(input('Enter the number of seats to reserve: '))
+print(reserve_seats(num_seats))
+
+# Display the seat layout
+for i in range(0, 80, 7):
+    print(seats[i:i+7])
